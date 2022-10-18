@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+service ProductService {
+    rpc List (Void) returns (ProductListResponse);
+}
+
+message Void {}
+
+message Product {
+    uint32 id = 1;
+    string name = 2;
+    uint32 quantity = 3;
+}
+
+message ProductListResponse {
+    repeated Product products = 1;
+}
+
