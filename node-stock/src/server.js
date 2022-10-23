@@ -13,24 +13,28 @@ const productsDB = [
 
 const List = (_, callback) => callback(null, { products: productsDB });
 
-const gRPCServerBindCallback = (error, port) => {
-    if (error) {
-        console.error(error);
-    } else {
-        console.log(`gRPC server listening on port ${port}...`);
-        gRPCServer.start();
-    }
-};
+function initialize() {
+    const protoObject = protoLoader.loadSync(
+        path.resolve(__dirname, "../../proto/products.proto")
+    );
+    const productsDefinition = grpc.loadPackageDefinition(protoObject);
 
-const protoObject = protoLoader.loadSync(
-    path.resolve(__dirname, "../../proto/products.proto")
-);
-const productsDefinition = grpc.loadPackageDefinition(protoObject);
+    const gRPCServer = new grpc.Server();
+    const gRPCServerBindCallback = (error, port) => {
+        if (error) {
+            console.error(error);
+        } else {
+            console.log(`gRPC server listening on port ${port}...`);
+            gRPCServer.start();
+        }
+    };
 
-const gRPCServer = new grpc.Server();
-gRPCServer.addService(productsDefinition.ProductService.service, { List });
-gRPCServer.bindAsync(
-    "0.0.0.0:50051",
-    grpc.ServerCredentials.createInsecure(),
-    gRPCServerBindCallback
-);
+    gRPCServer.addService(productsDefinition.ProductService.service, { List });
+    gRPCServer.bindAsync(
+        "0.0.0.0:50051",
+        grpc.ServerCredentials.createInsecure(),
+        gRPCServerBindCallback
+    );
+}
+
+module.exports = { initialize };
