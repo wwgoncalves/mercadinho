@@ -1,4 +1,4 @@
 # mercadinho
 
-> A simple stock'n'store project using gRPC, RabbitMQ and REST.
+> A simple communication project between two services, a stock and a store, using gRPC, RabbitMQ and REST.
 
