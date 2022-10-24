@@ -8,6 +8,7 @@ import (
 
 const (
 	productsServerAddr = "127.0.0.1:50051"
+	rabbitmqAddr       = "amqp://guest:guest@localhost:5672/"
 )
 
 func main() {
@@ -16,4 +17,8 @@ func main() {
 	for _, product := range productsList {
 		log.Printf("Product %d - %s - %d items remaining\n", product.Id, product.Name, product.Quantity)
 	}
+
+	msgBroker := services.NewRabbitMQ(rabbitmqAddr)
+	msgBroker.WithdrawProduct()
+
 }
