@@ -2,10 +2,12 @@ package services
 
 import (
 	"context"
+	"store/src/proto/products"
 	"store/src/utils"
 	"time"
 
 	amqp "github.com/rabbitmq/amqp091-go"
+	"google.golang.org/protobuf/proto"
 )
 
 const (
@@ -21,7 +23,7 @@ func NewRabbitMQ(addr string) *RabbitMQ {
 }
 
 // Publish sends a message to a RabbitMQ queue.
-func (r *RabbitMQ) Publish(queueName string, msg string) {
+func (r *RabbitMQ) Publish(queueName string, msg *products.Product) {
 	conn, err := amqp.Dial(r.addr)
 	utils.ExitOnError(err, "Could not connect to RabbitMQ")
 
@@ -32,13 +34,16 @@ func (r *RabbitMQ) Publish(queueName string, msg string) {
 	defer ch.Close()
 	q, err := ch.QueueDeclare(
 		queueName, // name
-		false,     // durable
+		true,      // durable
 		false,     // delete when unused
 		false,     // exclusive
 		false,     // no-wait
 		nil,       // arguments
 	)
 	utils.ExitOnError(err, "Could not declare a queue")
+
+	body, err := proto.Marshal(msg)
+	utils.ExitOnError(err, "Could not serialize the message")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -50,13 +55,14 @@ func (r *RabbitMQ) Publish(queueName string, msg string) {
 		false,  // mandatory
 		false,  // immediate
 		amqp.Publishing{
-			ContentType: "text/plain",
-			Body:        []byte(msg),
+			DeliveryMode: amqp.Persistent,
+			ContentType:  "application/x-protobuf",
+			Body:         body,
 		})
 	utils.ExitOnError(err, "Could not publish a message")
 }
 
 // WithdrawProduct publishes a product message to the withdrawals queue.
 func (r *RabbitMQ) WithdrawProduct() {
-	r.Publish(withdrawalsQueue, "test321")
+	r.Publish(withdrawalsQueue, &products.Product{Id: 6, Name: "Bleh Test321", Quantity: 12345})
 }
