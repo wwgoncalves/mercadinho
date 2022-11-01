@@ -24,7 +24,7 @@ function initialize() {
         if (error) {
             console.error(error);
         } else {
-            console.log(`gRPC server listening on port ${port}...`);
+            console.log("gRPC server listening on port %d...", port);
             gRPCServer.start();
         }
     };
