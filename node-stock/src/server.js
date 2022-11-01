@@ -1,6 +1,6 @@
+const { protoObject } = require("./proto/products");
+
 const grpc = require("@grpc/grpc-js");
-const protoLoader = require("@grpc/proto-loader");
-const path = require("path");
 
 const productsDB = [
     { id: 1, name: "Smartphone Motorola Moto X4", quantity: 11 },
@@ -14,9 +14,6 @@ const productsDB = [
 const List = (_, callback) => callback(null, { products: productsDB });
 
 function initialize() {
-    const protoObject = protoLoader.loadSync(
-        path.resolve(__dirname, "../../proto/products.proto")
-    );
     const productsDefinition = grpc.loadPackageDefinition(protoObject);
 
     const gRPCServer = new grpc.Server();
