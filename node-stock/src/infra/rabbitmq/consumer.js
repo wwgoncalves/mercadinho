@@ -1,8 +1,9 @@
 const amqp = require("amqplib");
+const { ProtoProduct } = require("../proto/products");
 
 const withdrawalsQueue = "withdrawal";
 
-class MessageBroker {
+class MessageConsumer {
     ready;
     connection;
     channel;
@@ -42,4 +43,18 @@ class MessageBroker {
     }
 }
 
-module.exports = new MessageBroker();
+function initialize() {
+    const consumeWithdrawalMessage = (ackFn) => (msg) => {
+        console.log(
+            "Received from `withdrawal`: %s",
+            ProtoProduct.decode(msg.content).toJSON()
+        );
+
+        ackFn(msg);
+    };
+
+    const consumer = new MessageConsumer();
+    consumer.subscribeToWithdrawal(consumeWithdrawalMessage);
+}
+
+module.exports = { initialize };

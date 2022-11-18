@@ -4,7 +4,7 @@ const protoLoader = require("@grpc/proto-loader");
 
 const protoFile = path.resolve(__dirname, "../../../../proto/products.proto");
 
-const protoObject = protoLoader.loadSync(protoFile);
-const Product = protobuf.loadSync(protoFile).lookupType("Product");
+const protoPkgDefinition = protoLoader.loadSync(protoFile);
+const ProtoProduct = protobuf.loadSync(protoFile).lookupType("Product");
 
-module.exports = { protoObject, Product };
+module.exports = { protoPkgDefinition, ProtoProduct };
