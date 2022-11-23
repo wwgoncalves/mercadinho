@@ -1,9 +1,12 @@
 const grpc = require("@grpc/grpc-js");
-const ProductController = require("../../controller/ProductController");
 const { protoPkgDefinition } = require("../proto/products");
+const ProductRepositoryMemory = require("../repository/ProductRepositoryMemory");
+const ProductController = require("../../controller/ProductController");
+
+const productRepository = new ProductRepositoryMemory();
 
 function listProducts(_, callback) {
-    ProductController.listProducts().then((products) =>
+    ProductController.listProducts(productRepository).then((products) =>
         callback(null, { products })
     );
 }
